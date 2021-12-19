@@ -25,6 +25,7 @@ class ApplicantUserModel(BaseUserModel):
     education = db.Column(db.String(255), nullable=False)
     photo_url = db.Column(db.String, nullable=False)
     skills = relationship("SkillModel", secondary="users_skills")
+    applied_advertisements = relationship("AdvertisementModel", secondary="applied_advertisements")
 
 
 class CompanyUserModel(BaseUserModel):
