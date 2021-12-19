@@ -24,7 +24,7 @@ class ApplicantUserModel(BaseUserModel):
     previous_position = db.Column(db.String(255), nullable=True)
     education = db.Column(db.String(255), nullable=False)
     photo_url = db.Column(db.String, nullable=False)
-    skills = relationship("SkillModel", secondary="skills_users")
+    skills = relationship("SkillModel", secondary="users_skills")
 
 
 class CompanyUserModel(BaseUserModel):
