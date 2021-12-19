@@ -1,3 +1,5 @@
+from sqlalchemy.orm import relationship
+
 from db import db
 
 
@@ -6,3 +8,4 @@ class SkillModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     skill_name = db.Column(db.String(255), nullable=False)
+    users = relationship("ApplicantUserModel", secondary="skills_users")
