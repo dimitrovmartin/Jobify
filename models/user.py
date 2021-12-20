@@ -38,7 +38,7 @@ class CompanyUserModel(BaseUserModel):
     role = db.Column(db.Enum(RoleType),
                      default=RoleType.company,
                      nullable=False)
-    advertisements = db.relationship("AdvertisementModel", backref="company_user", lazy='dynamic')
+    advertisements = db.relationship("AdvertisementModel", back_populates='company', lazy='dynamic')
 
 
 class AdminUserModel(BaseUserModel):

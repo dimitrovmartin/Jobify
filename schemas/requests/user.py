@@ -1,4 +1,7 @@
 from marshmallow import Schema, fields, validate
+from marshmallow_enum import EnumField
+
+from models import Positions
 
 
 class BaseUserSchema(Schema):
@@ -9,7 +12,7 @@ class BaseUserSchema(Schema):
 class ApplicantRegisterRequestSchema(BaseUserSchema):
     first_name = fields.String(required=True, validate=validate.Length(min=2, max=255))
     last_name = fields.String(required=True, validate=validate.Length(min=2, max=255))
-    previous_position = fields.String(required=False)
+    position = EnumField(Positions, by_value=True)
     education = fields.String(required=True, validate=validate.Length(min=10, max=255))
     phone = fields.String(required=True, validate=validate.Length(min=10, max=10))
     photo_url = fields.String(required=True)

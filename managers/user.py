@@ -3,6 +3,7 @@ from werkzeug.exceptions import BadRequest, InternalServerError
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from db import db
+from models import Positions
 from models.user import ApplicantUserModel, CompanyUserModel
 
 GLOBALS = {'ApplicantUserModel': ApplicantUserModel,
@@ -14,6 +15,11 @@ class UserManager:
     def register(user_data, user_model):
         GLOBALS['user_data'] = user_data
         user_data['password'] = generate_password_hash(user_data['password'])
+        position = user_data['position']
+        position_key = [i.name for i in Positions if i.value == position][0]
+
+        user_data['position'] = eval(f'Positions.{position_key}')
+
         user = eval(f'{user_model}UserModel(**user_data)', GLOBALS)
 
         db.session.add(user)
