@@ -1,5 +1,3 @@
-from sqlalchemy.orm import relationship
-
 from db import db
 
 
@@ -12,5 +10,5 @@ class AdvertisementModel(db.Model):
     description = db.Column(db.Text, nullable=False)
     company_user_id = db.Column(db.Integer, db.ForeignKey('company_users.id'))
     company = db.relationship('CompanyUserModel')
-    skills = relationship("SkillModel", secondary="advertisements_skills")
-    appliers = relationship('ApplicantUserModel', secondary="applied_advertisements")
+    appliers = db.relationship('ApplicantUserModel', secondary="applied_advertisements",
+                               back_populates='advertisements')

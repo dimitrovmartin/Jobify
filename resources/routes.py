@@ -1,4 +1,4 @@
-from resources.advertisement import Advertisement
+from resources.advertisement import Advertisement, ApplyAdvertisement
 from resources.auth import RegisterApplicant, LoginApplicant, RegisterCompany, LoginCompany
 
 routes = (
@@ -6,5 +6,6 @@ routes = (
     (LoginApplicant, '/loginApplicant'),
     (RegisterCompany, '/registerCompany'),
     (LoginCompany, '/loginCompany'),
-    (Advertisement, '/advertisements')
+    (Advertisement, '/advertisements'),
+    (ApplyAdvertisement, '/applyAdvertisement')
 )

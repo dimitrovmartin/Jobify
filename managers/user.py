@@ -13,7 +13,6 @@ class UserManager:
     @staticmethod
     def register(user_data, user_model):
         GLOBALS['user_data'] = user_data
-
         user_data['password'] = generate_password_hash(user_data['password'])
         user = eval(f'{user_model}UserModel(**user_data)', GLOBALS)
 

@@ -1,5 +1,3 @@
-from sqlalchemy.orm import relationship
-
 from db import db
 from models.enums import RoleType
 
@@ -24,8 +22,8 @@ class ApplicantUserModel(BaseUserModel):
     previous_position = db.Column(db.String(255), nullable=True)
     education = db.Column(db.String(255), nullable=False)
     photo_url = db.Column(db.String, nullable=False)
-    skills = relationship("SkillModel", secondary="users_skills")
-    applied_advertisements = relationship("AdvertisementModel", secondary="applied_advertisements")
+    advertisements = db.relationship("AdvertisementModel", secondary="applied_advertisements",
+                                     back_populates='appliers')
 
 
 class CompanyUserModel(BaseUserModel):
