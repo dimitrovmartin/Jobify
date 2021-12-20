@@ -66,7 +66,7 @@ class AdvertisementsPerPreviousPosition(Resource):
     @permission_required(RoleType.applicant)
     def get(self):
         current_user = auth.current_user()
-        advertisements = AdvertisementManager.get_all_advertisements_by_previous_position(
-            current_user.previous_position)
+        advertisements = AdvertisementManager.get_all_advertisements_by_position(
+            current_user.position)
 
         return AdvertisementResponseSchema().dump(advertisements, many=True)

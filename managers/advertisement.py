@@ -70,7 +70,7 @@ class AdvertisementManager:
         return company.advertisements
 
     @staticmethod
-    def get_all_advertisements_by_previous_position(previous_position):
-        ads = AdvertisementModel.query.filter_by(position=previous_position).all()
+    def get_all_advertisements_by_position(position):
+        ads = AdvertisementModel.query.filter_by(position=position).all()
 
         return ads

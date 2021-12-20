@@ -12,5 +12,5 @@ routes = (
     (AdvertisementDelete, '/advertisements/<int:_id>/delete'),
     (AdvertisementUpdate, '/advertisements/<int:_id>/update'),
     (AdvertisementsPerCompany, '/advertisements/<string:company_name>'),
-    (AdvertisementsPerPreviousPosition, '/advertisements/previousPosition')
+    (AdvertisementsPerPreviousPosition, '/advertisements/position')
 )
