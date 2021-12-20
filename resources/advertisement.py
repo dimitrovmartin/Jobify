@@ -4,7 +4,8 @@ from flask_restful import Resource
 from managers.advertisement import AdvertisementManager
 from managers.auth import auth
 from models import RoleType
-from schemas.requests.advertisement import AdvertisementCreateRequestSchema, ApplyAdvertisementRequestSchema
+from schemas.requests.advertisement import AdvertisementCreateRequestSchema, \
+    AdvertisementUpdateRequestSchema
 from schemas.response.advertisement import AdvertisementResponseSchema
 from utils.decorators import validate_schema, permission_required
 
@@ -41,3 +42,13 @@ class ApplyAdvertisement(Resource):
         applied_advertisement = AdvertisementManager.apply(current_user.id, _id)
 
         return {'message': f'You successfully applied your CV to this Ad! Status: {applied_advertisement.status.value}'}
+
+
+class AdvertisementUpdate(Resource):
+    @auth.login_required
+    @permission_required(RoleType.company)
+    @validate_schema(AdvertisementUpdateRequestSchema)
+    def put(self, _id):
+        current_user = auth.current_user()
+        ad = AdvertisementManager.update(_id, current_user.id, request.get_json())
+        return AdvertisementResponseSchema().dump(ad)

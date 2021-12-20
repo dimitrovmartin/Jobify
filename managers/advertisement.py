@@ -1,3 +1,4 @@
+from sqlalchemy import update
 from werkzeug.exceptions import BadRequest
 
 from db import db
@@ -42,3 +43,16 @@ class AdvertisementManager:
     @staticmethod
     def get_all_advertisements():
         return AdvertisementModel.query.all()
+
+    @staticmethod
+    def update(_id, current_user_id, data):
+        num_rows_updated = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).update(data)
+
+        if not num_rows_updated:
+            raise BadRequest('Invalid ID!')
+
+        ad = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).first()
+
+        db.session.commit()
+
+        return ad
