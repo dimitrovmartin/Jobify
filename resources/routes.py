@@ -1,5 +1,6 @@
 from resources.advertisement import AdvertisementListCreate, ApplyAdvertisement, AdvertisementDelete, \
-    AdvertisementUpdate, AdvertisementsPerCompany, AdvertisementsPerPreviousPosition
+    AdvertisementUpdate, AdvertisementsPerCompany, AdvertisementsPerPreviousPosition, ApproveAdvertisement, \
+    RejectAdvertisement
 from resources.auth import RegisterApplicant, LoginApplicant, RegisterCompany, LoginCompany
 
 routes = (
@@ -12,5 +13,7 @@ routes = (
     (AdvertisementDelete, '/advertisements/<int:_id>/delete'),
     (AdvertisementUpdate, '/advertisements/<int:_id>/update'),
     (AdvertisementsPerCompany, '/advertisements/<string:company_name>'),
-    (AdvertisementsPerPreviousPosition, '/advertisements/position')
+    (AdvertisementsPerPreviousPosition, '/advertisements/position'),
+    (ApproveAdvertisement, '/advertisements/<int:ad_id>/<int:user_id>/approve'),
+    (RejectAdvertisement, '/advertisements/<int:ad_id>/<int:user_id>/reject')
 )

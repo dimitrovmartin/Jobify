@@ -1,7 +1,7 @@
 from werkzeug.exceptions import BadRequest
 
 from db import db
-from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions
+from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions, Status
 
 
 class AdvertisementManager:
@@ -74,3 +74,36 @@ class AdvertisementManager:
         ads = AdvertisementModel.query.filter_by(position=position).all()
 
         return ads
+
+    @staticmethod
+    def approve(ad_id, user_id, current_user):
+        ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id, advertisement_id=ad_id).first()
+        if not ad:
+            raise BadRequest('Invalid ID!')
+
+        AdvertisementModel.__validate_ad(ad, current_user.advertisements)
+
+        ad.status = Status.approved
+        db.session.commit()
+
+    @staticmethod
+    def reject(ad_id, user_id, current_user):
+        ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id, advertisement_id=ad_id).first()
+        if not ad:
+            raise BadRequest('Invalid ID!')
+
+        AdvertisementModel.__validate_ad(ad, current_user.advertisements)
+
+        ad.status = Status.rejected
+        db.session.commit()
+
+    @staticmethod
+    def __validate_ad(ad, advertisements):
+        if ad.advertisement_id not in [a.id for a in advertisements]:
+            raise BadRequest('Invalid Advertisement!')
+
+        if ad.status == Status.approved:
+            raise BadRequest('This advertisement was already approved!')
+
+        if ad.status == Status.rejected:
+            raise BadRequest('This advertisement was already rejected!')

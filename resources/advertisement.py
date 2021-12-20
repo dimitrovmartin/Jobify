@@ -36,7 +36,7 @@ class AdvertisementDelete(Resource):
 
 class ApplyAdvertisement(Resource):
     @auth.login_required
-    @permission_required(RoleType.company)
+    @permission_required(RoleType.applicant)
     def post(self, _id):
         current_user = auth.current_user()
         applied_advertisement = AdvertisementManager.apply(current_user.id, _id)
@@ -70,3 +70,23 @@ class AdvertisementsPerPreviousPosition(Resource):
             current_user.position)
 
         return AdvertisementResponseSchema().dump(advertisements, many=True)
+
+
+class ApproveAdvertisement(Resource):
+    @auth.login_required
+    @permission_required(RoleType.company)
+    def post(self, ad_id, user_id):
+        current_user = auth.current_user()
+        AdvertisementManager.approve(ad_id, user_id, current_user)
+
+        return {'message': f'User with ID {user_id} was approved for the job!'}
+
+
+class RejectAdvertisement(Resource):
+    @auth.login_required
+    @permission_required(RoleType.company)
+    def post(self, ad_id, user_id):
+        current_user = auth.current_user()
+        AdvertisementManager.reject(ad_id, user_id, current_user)
+
+        return {'message': f'User with ID {user_id} was rejected!'}
