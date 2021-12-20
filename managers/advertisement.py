@@ -2,7 +2,7 @@ from sqlalchemy import update
 from werkzeug.exceptions import BadRequest
 
 from db import db
-from models import AdvertisementModel, AppliedAdvertisementModel
+from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel
 
 
 class AdvertisementManager:
@@ -56,3 +56,13 @@ class AdvertisementManager:
         db.session.commit()
 
         return ad
+
+    @staticmethod
+    def get_all_advertisements_by_company_name(company_name):
+        company = CompanyUserModel.query.filter_by(company_name=company_name).first()
+
+        if not company:
+            raise BadRequest('Invalid company!')
+
+        return company.advertisements
+

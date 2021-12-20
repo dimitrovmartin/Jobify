@@ -52,3 +52,10 @@ class AdvertisementUpdate(Resource):
         current_user = auth.current_user()
         ad = AdvertisementManager.update(_id, current_user.id, request.get_json())
         return AdvertisementResponseSchema().dump(ad)
+
+
+class AdvertisementsPerCompany(Resource):
+    @auth.login_required
+    def get(self, company_name):
+        advertisements = AdvertisementManager.get_all_advertisements_by_company_name(company_name)
+        return AdvertisementResponseSchema().dump(advertisements, many=True)
