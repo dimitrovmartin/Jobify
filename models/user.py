@@ -1,5 +1,5 @@
 from db import db
-from models.enums import RoleType
+from models.enums import RoleType, Positions
 
 
 class BaseUserModel(db.Model):
@@ -19,7 +19,9 @@ class ApplicantUserModel(BaseUserModel):
     role = db.Column(db.Enum(RoleType),
                      default=RoleType.applicant,
                      nullable=False)
-    previous_position = db.Column(db.String(255), nullable=True)
+    position = db.Column(db.Enum(Positions),
+                         default=Positions.unemployed,
+                         nullable=True)
     education = db.Column(db.String(255), nullable=False)
     photo_url = db.Column(db.String, nullable=False)
     advertisements = db.relationship("AdvertisementModel", secondary="applied_advertisements",

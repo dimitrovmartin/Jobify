@@ -1,4 +1,3 @@
-from sqlalchemy import update
 from werkzeug.exceptions import BadRequest
 
 from db import db
@@ -66,3 +65,8 @@ class AdvertisementManager:
 
         return company.advertisements
 
+    @staticmethod
+    def get_all_advertisements_by_previous_position(previous_position):
+        ads = AdvertisementModel.query.filter_by(position=previous_position).all()
+
+        return ads

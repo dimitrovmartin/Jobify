@@ -59,3 +59,14 @@ class AdvertisementsPerCompany(Resource):
     def get(self, company_name):
         advertisements = AdvertisementManager.get_all_advertisements_by_company_name(company_name)
         return AdvertisementResponseSchema().dump(advertisements, many=True)
+
+
+class AdvertisementsPerPreviousPosition(Resource):
+    @auth.login_required
+    @permission_required(RoleType.applicant)
+    def get(self):
+        current_user = auth.current_user()
+        advertisements = AdvertisementManager.get_all_advertisements_by_previous_position(
+            current_user.previous_position)
+
+        return AdvertisementResponseSchema().dump(advertisements, many=True)
