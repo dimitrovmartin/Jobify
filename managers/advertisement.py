@@ -23,6 +23,22 @@ class AdvertisementManager:
         applied_advertisement = AppliedAdvertisementModel(applicant_user_id=user_id, advertisement_id=advertisement_id)
 
         db.session.add(applied_advertisement)
+        try:
+            db.session.commit()
+        except Exception:
+            raise BadRequest('Invalid ad')
+        return applied_advertisement
+
+    @staticmethod
+    def delete(_id, current_user_id):
+        ad = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).first()
+
+        if not ad:
+            raise BadRequest('Invalid ID!')
+
+        db.session.delete(ad)
         db.session.commit()
 
-        return applied_advertisement
+    @staticmethod
+    def get_all_advertisements():
+        return AdvertisementModel.query.all()

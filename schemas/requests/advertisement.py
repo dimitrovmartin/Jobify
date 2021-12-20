@@ -9,3 +9,10 @@ class AdvertisementCreateRequestSchema(Schema):
 
 class ApplyAdvertisementRequestSchema(Schema):
     id = fields.Integer(required=True)
+
+
+class AdvertisementUpdateRequestSchema(Schema):
+    title = fields.String(required=False)
+    position = fields.String(required=False)
+    description = fields.String(required=False)
+    salary = fields.Float(required=False)
