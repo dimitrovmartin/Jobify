@@ -1,7 +1,9 @@
 from werkzeug.exceptions import BadRequest
 
 from db import db
-from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions, Status
+from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions, Status, \
+    ApplicantUserModel
+from services.flask_email_service import send_mail
 
 
 class AdvertisementManager:
@@ -77,33 +79,38 @@ class AdvertisementManager:
 
     @staticmethod
     def approve(ad_id, user_id, current_user):
-        ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id, advertisement_id=ad_id).first()
-        if not ad:
-            raise BadRequest('Invalid ID!')
-
-        AdvertisementModel.__validate_ad(ad, current_user.advertisements)
-
-        ad.status = Status.approved
-        db.session.commit()
+        AdvertisementManager.change_status(ad_id, user_id, current_user, Status.approved)
 
     @staticmethod
     def reject(ad_id, user_id, current_user):
-        ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id, advertisement_id=ad_id).first()
-        if not ad:
-            raise BadRequest('Invalid ID!')
-
-        AdvertisementModel.__validate_ad(ad, current_user.advertisements)
-
-        ad.status = Status.rejected
-        db.session.commit()
+        AdvertisementManager.change_status(ad_id, user_id, current_user, Status.rejected)
 
     @staticmethod
     def __validate_ad(ad, advertisements):
-        if ad.advertisement_id not in [a.id for a in advertisements]:
-            raise BadRequest('Invalid Advertisement!')
+        for a in advertisements:
+            if a.id == ad.advertisement_id:
+                if ad.status == Status.approved:
+                    raise BadRequest('This advertisement was already approved!')
 
-        if ad.status == Status.approved:
-            raise BadRequest('This advertisement was already approved!')
+                if ad.status == Status.rejected:
+                    raise BadRequest('This advertisement was already rejected!')
 
-        if ad.status == Status.rejected:
-            raise BadRequest('This advertisement was already rejected!')
+                return a
+
+        raise BadRequest('Invalid Advertisement!')
+
+    @staticmethod
+    def change_status(ad_id, user_id, current_user, status):
+        applied_ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id,
+                                                               advertisement_id=ad_id).first()
+        if not applied_ad:
+            raise BadRequest('Invalid ID!')
+
+        ad = AdvertisementManager.__validate_ad(applied_ad, current_user.advertisements)
+        applicant = ApplicantUserModel.query.filter_by(id=user_id).first()
+
+        applied_ad.status = status
+
+        send_mail(applicant.email, applied_ad.status.value, ad.title)
+
+        db.session.commit()
