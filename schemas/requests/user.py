@@ -15,7 +15,8 @@ class ApplicantRegisterRequestSchema(BaseUserSchema):
     position = EnumField(Positions, by_value=True)
     education = fields.String(required=True, validate=validate.Length(min=10, max=255))
     phone = fields.String(required=True, validate=validate.Length(min=10, max=10))
-    photo_url = fields.String(required=True)
+    photo = fields.String(required=True)
+    photo_extension = fields.String(required=True)
 
 
 class ApplicantLoginRequestSchema(BaseUserSchema):

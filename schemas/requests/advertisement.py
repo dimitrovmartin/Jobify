@@ -10,10 +10,6 @@ class AdvertisementCreateRequestSchema(Schema):
     description = fields.String(required=True, validate=validate.Length(min=5, max=100))
 
 
-class ApplyAdvertisementRequestSchema(Schema):
-    id = fields.Integer(required=True)
-
-
 class AdvertisementUpdateRequestSchema(Schema):
     title = fields.String(required=False)
     position = EnumField(Positions, by_value=True)
