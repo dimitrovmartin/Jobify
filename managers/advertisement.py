@@ -147,3 +147,15 @@ class AdvertisementManager:
         ad['company']['employees_count'] = company.employees_count
 
         return ad
+
+    @staticmethod
+    def get_all_appliers_per_advertisement(current_user, ad_id):
+        if ad_id not in [ad.id for ad in current_user.advertisements]:
+            raise BadRequest('Invalid ID!')
+
+        appliers_ids = db.session.query(AppliedAdvertisementModel.applicant_user_id).filter(
+            AppliedAdvertisementModel.advertisement_id == ad_id).all()
+
+        appliers = db.session.query(ApplicantUserModel).filter(ApplicantUserModel.id.in_(appliers_ids[0]))
+
+        return appliers

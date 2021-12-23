@@ -7,6 +7,7 @@ from models import RoleType
 from schemas.requests.advertisement import AdvertisementCreateRequestSchema, \
     AdvertisementUpdateRequestSchema
 from schemas.response.advertisement import AdvertisementResponseSchema
+from schemas.response.user import ApplicantResponseSchema
 from utils.decorators import validate_schema, permission_required
 
 
@@ -102,3 +103,13 @@ class RejectAdvertisement(Resource):
         AdvertisementManager.reject(ad_id, user_id, current_user)
 
         return {'message': f'User with ID {user_id} was rejected!'}
+
+
+class GetAllAppliersPerAdvertisement(Resource):
+    @auth.login_required
+    @permission_required(RoleType.company)
+    def get(self, _id):
+        current_user = auth.current_user()
+        appliers = AdvertisementManager.get_all_appliers_per_advertisement(current_user, _id)
+
+        return ApplicantResponseSchema().dump(appliers, many=True)
