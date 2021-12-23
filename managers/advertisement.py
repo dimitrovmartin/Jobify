@@ -3,7 +3,7 @@ from werkzeug.exceptions import BadRequest
 from db import db
 from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions, Status, \
     ApplicantUserModel
-from services.flask_email_service import send_mail
+from services.email_service import send_mail
 
 
 class AdvertisementManager:
@@ -51,6 +51,9 @@ class AdvertisementManager:
 
     @staticmethod
     def update(_id, current_user_id, data):
+        if not data:
+            raise BadRequest('Invalid JSON!')
+
         num_rows_updated = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).update(data)
 
         if not num_rows_updated:
