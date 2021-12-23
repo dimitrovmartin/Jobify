@@ -3,6 +3,7 @@ from werkzeug.exceptions import BadRequest
 from db import db
 from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions, Status, \
     ApplicantUserModel
+from schemas.response.advertisement import AdvertisementResponseSchema
 from services.email_service import send_mail
 
 
@@ -34,6 +35,13 @@ class AdvertisementManager:
         except Exception:
             raise BadRequest('Invalid ad')
         return applied_advertisement
+
+    @staticmethod
+    def get(_id):
+        ad = AdvertisementModel.query.filter_by(id=_id).first()
+
+        if ad:
+            return AdvertisementManager.attach_company_to_advertisements(ad)
 
     @staticmethod
     def delete(_id, current_user_id):
@@ -76,6 +84,12 @@ class AdvertisementManager:
 
     @staticmethod
     def get_all_advertisements_by_position(position):
+        if isinstance(position, str):
+            try:
+                position = eval(f'Positions.{position.lower()}', {'Positions': Positions})
+            except Exception:
+                return []
+
         ads = AdvertisementModel.query.filter_by(position=position).all()
 
         return ads
@@ -117,3 +131,19 @@ class AdvertisementManager:
         send_mail(applicant.email, applied_ad.status.value, ad.title)
 
         db.session.commit()
+
+    @staticmethod
+    def attach_company_to_advertisements(ad):
+        company = ad.company
+
+        ad = AdvertisementResponseSchema().dump(ad)
+
+        ad['company'] = {}
+        ad['company']['company_name'] = company.company_name
+        ad['company']['address'] = company.address
+        ad['company']['email'] = company.email
+        ad['company']['phone'] = company.phone
+        ad['company']['description'] = company.description
+        ad['company']['employees_count'] = company.employees_count
+
+        return ad

@@ -11,7 +11,6 @@ from utils.decorators import validate_schema, permission_required
 
 
 class AdvertisementListCreate(Resource):
-    @auth.login_required
     def get(self):
         ads = AdvertisementManager.get_all_advertisements()
         return AdvertisementResponseSchema().dump(ads, many=True)
@@ -22,7 +21,13 @@ class AdvertisementListCreate(Resource):
     def post(self):
         current_user = auth.current_user()
         ad = AdvertisementManager.create(request.get_json(), current_user.id)
+
         return {'ad_id': ad.id}
+
+
+class AdvertisementGet(Resource):
+    def get(self, _id):
+        return AdvertisementManager.get(_id)
 
 
 class AdvertisementDelete(Resource):
@@ -31,6 +36,7 @@ class AdvertisementDelete(Resource):
     def delete(self, _id):
         current_user = auth.current_user()
         AdvertisementManager.delete(_id, current_user.id)
+
         return {'message': f'Advertisement with ID {_id} was successfully deleted.'}
 
 
@@ -51,25 +57,31 @@ class AdvertisementUpdate(Resource):
     def put(self, _id):
         current_user = auth.current_user()
         ad = AdvertisementManager.update(_id, current_user.id, request.get_json())
+
         return AdvertisementResponseSchema().dump(ad)
 
 
 class AdvertisementsPerCompany(Resource):
-    @auth.login_required
     def get(self, company_name):
-        advertisements = AdvertisementManager.get_all_advertisements_by_company_name(company_name)
-        return AdvertisementResponseSchema().dump(advertisements, many=True)
+        ads = AdvertisementManager.get_all_advertisements_by_company_name(company_name)
+
+        return AdvertisementResponseSchema().dump(ads, many=True)
 
 
-class AdvertisementsPerPreviousPosition(Resource):
+class AdvertisementsPerUserPosition(Resource):
     @auth.login_required
     @permission_required(RoleType.applicant)
     def get(self):
         current_user = auth.current_user()
-        advertisements = AdvertisementManager.get_all_advertisements_by_position(
+        ads = AdvertisementManager.get_all_advertisements_by_position(
             current_user.position)
+        return AdvertisementResponseSchema().dump(ads, many=True)
 
-        return AdvertisementResponseSchema().dump(advertisements, many=True)
+
+class AdvertisementsPerPosition(Resource):
+    def get(self, position):
+        ads = AdvertisementManager.get_all_advertisements_by_position(position)
+        return AdvertisementResponseSchema().dump(ads, many=True)
 
 
 class ApproveAdvertisement(Resource):
