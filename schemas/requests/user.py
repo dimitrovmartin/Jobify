@@ -33,3 +33,11 @@ class CompanyRegisterRequestSchema(BaseUserSchema):
 
 class CompanyLoginRequestSchema(BaseUserSchema):
     pass
+
+
+class AdminRegisterRequestSchema(BaseUserSchema):
+    phone = fields.String(required=True, validate=validate.Length(min=10, max=10))
+
+
+class AdminLoginRequestSchema(BaseUserSchema):
+    pass

@@ -42,8 +42,10 @@ class AdvertisementManager:
     def get(_id):
         ad = AdvertisementModel.query.filter_by(id=_id).first()
 
-        if ad:
-            return AdvertisementManager.attach_company_to_advertisements(ad)
+        if not ad:
+            raise BadRequest('Invalid ID!')
+
+        return AdvertisementManager.attach_company_to_advertisements(ad)
 
     @staticmethod
     def delete(_id, current_user_id):
@@ -90,7 +92,7 @@ class AdvertisementManager:
             try:
                 position = eval(f'Positions.{position.lower()}', {'Positions': Positions})
             except Exception:
-                return []
+                raise BadRequest('Invalid position!')
 
         ads = AdvertisementModel.query.filter_by(position=position).all()
 
@@ -152,15 +154,17 @@ class AdvertisementManager:
 
     @staticmethod
     def get_all_appliers_per_advertisement(current_user, ad_id):
-        if ad_id not in [ad.id for ad in current_user.advertisements]:
-            raise BadRequest('Invalid ID!')
+        searched_ad = None
 
-        appliers_ids = db.session.query(AppliedAdvertisementModel.applicant_user_id).filter(
-            AppliedAdvertisementModel.advertisement_id == ad_id).all()
+        for ad in current_user.advertisements:
+            if ad.id == ad_id:
+                searched_ad = ad
+                break
 
-        appliers = db.session.query(ApplicantUserModel).filter(ApplicantUserModel.id.in_(appliers_ids[0]))
+        if not searched_ad:
+            raise BadRequest('Invalid Ad!')
 
-        return appliers
+        return searched_ad.appliers
 
     @staticmethod
     def get_appliers_as_csv(appliers):

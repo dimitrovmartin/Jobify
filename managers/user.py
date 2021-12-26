@@ -8,7 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from constants import TEMP_FILE_FOLDER
 from db import db
 from models import Positions
-from models.user import ApplicantUserModel, CompanyUserModel
+from models.user import ApplicantUserModel, CompanyUserModel, AdminUserModel
 from services.s3 import S3Service
 from utils.helpers import decode_photo
 
@@ -46,9 +46,15 @@ class UserManager:
         return UserManager.create_user(user_data, user_model)
 
     @staticmethod
+    def admin_register(user_data, user_model):
+        user_data['password'] = generate_password_hash(user_data['password'])
+        return UserManager.create_user(user_data, user_model)
+
+    @staticmethod
     def create_user(user_data, user_model):
         user = eval(f'{user_model}UserModel(**user_data)', {'ApplicantUserModel': ApplicantUserModel,
                                                             'CompanyUserModel': CompanyUserModel,
+                                                            'AdminUserModel': AdminUserModel,
                                                             'user_data': user_data})
 
         db.session.add(user)
@@ -67,6 +73,7 @@ class UserManager:
         user = eval(f'{user_model}UserModel.query.filter_by(email=user_data[\'email\']).first()',
                     {'ApplicantUserModel': ApplicantUserModel,
                      'CompanyUserModel': CompanyUserModel,
+                     'AdminUserModel': AdminUserModel,
                      'user_data': user_data})
 
         if not user or not check_password_hash(user.password, user_data['password']):

@@ -37,6 +37,10 @@ auth = HTTPTokenAuth(scheme='Bearer')
 def verify_token(token):
     user_id, role = AuthManager.decode_token(token)
 
-    user = eval(f'{role.title()}UserModel.query.filter_by(id=user_id).first()')
+    user = eval(f'{role.title()}UserModel.query.filter_by(id=user_id).first()',
+                {'ApplicantUserModel': ApplicantUserModel,
+                 'CompanyUserModel': CompanyUserModel,
+                 'AdminUserModel': AdminUserModel,
+                 'user_id': user_id})
 
     return user
