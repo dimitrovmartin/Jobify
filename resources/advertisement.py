@@ -113,3 +113,14 @@ class GetAllAppliersPerAdvertisement(Resource):
         appliers = AdvertisementManager.get_all_appliers_per_advertisement(current_user, _id)
 
         return ApplicantResponseSchema().dump(appliers, many=True)
+
+
+class ExportAllAppliersPerAdvertisement(Resource):
+    @auth.login_required
+    @permission_required(RoleType.company)
+    def get(self, _id):
+        current_user = auth.current_user()
+        appliers = AdvertisementManager.get_all_appliers_per_advertisement(current_user, _id)
+
+        return AdvertisementManager.get_appliers_as_csv(ApplicantResponseSchema().dump(appliers, many=True))
+

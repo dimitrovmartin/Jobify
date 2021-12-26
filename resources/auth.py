@@ -11,7 +11,7 @@ from utils.decorators import validate_schema
 class RegisterApplicant(Resource):
     @validate_schema(ApplicantRegisterRequestSchema)
     def post(self):
-        user = UserManager.register(request.get_json(), 'Applicant')
+        user = UserManager.applicant_register(request.get_json(), 'Applicant')
         token = AuthManager.encode_token(user)
 
         return {'token': token}, 201
@@ -29,7 +29,7 @@ class LoginApplicant(Resource):
 class RegisterCompany(Resource):
     @validate_schema(CompanyRegisterRequestSchema)
     def post(self):
-        user = UserManager.register(request.get_json(), 'Company')
+        user = UserManager.company_register(request.get_json(), 'Company')
         token = AuthManager.encode_token(user)
 
         return {'token': token}, 201

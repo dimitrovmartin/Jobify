@@ -12,17 +12,12 @@ from models.user import ApplicantUserModel, CompanyUserModel
 from services.s3 import S3Service
 from utils.helpers import decode_photo
 
-GLOBALS = {'ApplicantUserModel': ApplicantUserModel,
-           'CompanyUserModel': CompanyUserModel}
-
 s3 = S3Service()
 
 
 class UserManager:
     @staticmethod
-    def register(user_data, user_model):
-        GLOBALS['user_data'] = user_data
-
+    def applicant_register(user_data, user_model):
         photo_name = f'{str(uuid.uuid4())}.{user_data["photo_extension"]}'
         path = os.path.join(TEMP_FILE_FOLDER, photo_name)
 
@@ -43,7 +38,18 @@ class UserManager:
 
         user_data['position'] = eval(f'Positions.{position_key}')
 
-        user = eval(f'{user_model}UserModel(**user_data)', GLOBALS)
+        return UserManager.create_user(user_data, user_model)
+
+    @staticmethod
+    def company_register(user_data, user_model):
+        user_data['password'] = generate_password_hash(user_data['password'])
+        return UserManager.create_user(user_data, user_model)
+
+    @staticmethod
+    def create_user(user_data, user_model):
+        user = eval(f'{user_model}UserModel(**user_data)', {'ApplicantUserModel': ApplicantUserModel,
+                                                            'CompanyUserModel': CompanyUserModel,
+                                                            'user_data': user_data})
 
         db.session.add(user)
 
@@ -58,9 +64,10 @@ class UserManager:
 
     @staticmethod
     def login(user_data, user_model):
-        GLOBALS['user_data'] = user_data
-
-        user = eval(f'{user_model}UserModel.query.filter_by(email=user_data[\'email\']).first()', GLOBALS)
+        user = eval(f'{user_model}UserModel.query.filter_by(email=user_data[\'email\']).first()',
+                    {'ApplicantUserModel': ApplicantUserModel,
+                     'CompanyUserModel': CompanyUserModel,
+                     'user_data': user_data})
 
         if not user or not check_password_hash(user.password, user_data['password']):
             raise BadRequest('Wrong username or password!')

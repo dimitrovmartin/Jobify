@@ -1,3 +1,5 @@
+import pandas as pd
+from flask import make_response
 from werkzeug.exceptions import BadRequest
 
 from db import db
@@ -159,3 +161,21 @@ class AdvertisementManager:
         appliers = db.session.query(ApplicantUserModel).filter(ApplicantUserModel.id.in_(appliers_ids[0]))
 
         return appliers
+
+    @staticmethod
+    def get_appliers_as_csv(appliers):
+        data = {}
+
+        for r in appliers:
+            for key, value in r.items():
+                if key not in data.keys():
+                    data[key] = []
+
+                data[key].append(value)
+
+        df = pd.DataFrame(data, columns=data.keys())
+
+        resp = make_response(df.to_csv(index=False))
+        resp.headers["Content-Disposition"] = f"attachment; filename=Appliers.csv"
+        resp.headers["Content-Type"] = "text/csv"
+        return resp
