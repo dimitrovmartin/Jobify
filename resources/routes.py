@@ -1,3 +1,4 @@
+from resources.admin import DeleteCompanyUser, DeleteApplicantUser
 from resources.advertisement import AdvertisementListCreate, ApplyAdvertisement, AdvertisementDelete, \
     AdvertisementUpdate, AdvertisementsPerCompany, AdvertisementsPerUserPosition, ApproveAdvertisement, \
     RejectAdvertisement, AdvertisementsPerPosition, AdvertisementGet, GetAllAppliersPerAdvertisement, \
@@ -22,5 +23,7 @@ routes = (
     (AdvertisementsPerUserPosition, '/advertisements/userPosition'),
     (AdvertisementsPerPosition, '/advertisements/position/<string:position>'),
     (ApproveAdvertisement, '/advertisements/<int:ad_id>/<int:user_id>/approve'),
-    (RejectAdvertisement, '/advertisements/<int:ad_id>/<int:user_id>/reject')
+    (RejectAdvertisement, '/advertisements/<int:ad_id>/<int:user_id>/reject'),
+    (DeleteCompanyUser, '/companyUsers/<int:_id>/delete'),
+    (DeleteApplicantUser, '/applicantUsers/<int:_id>/delete'),
 )

@@ -80,3 +80,19 @@ class UserManager:
             raise BadRequest('Wrong username or password!')
 
         return user
+
+    @staticmethod
+    def delete_user(_id, user_model):
+        user = eval(f'{user_model}UserModel.query.filter_by(id=_id).first()',
+                    {'ApplicantUserModel': ApplicantUserModel,
+                     'CompanyUserModel': CompanyUserModel,
+                     'AdminUserModel': AdminUserModel,
+                     '_id': _id})
+
+        if not user:
+            raise BadRequest(f'{user_model} user with ID {_id} does not exist!')
+
+        db.session.delete(user)
+        db.session.commit()
+
+        return user.id
