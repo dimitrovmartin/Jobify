@@ -56,12 +56,12 @@ class UserManager:
                                                             'CompanyUserModel': CompanyUserModel,
                                                             'AdminUserModel': AdminUserModel,
                                                             'user_data': user_data})
-
-        db.session.add(user)
-
         try:
-            db.session.commit()
+            db.session.add(user)
+            db.session.flush()
         except Exception as ex:
+            db.session.rollback()
+
             if ex.orig.pgcode == UNIQUE_VIOLATION:
                 raise BadRequest('Please login.')
             else:
@@ -93,6 +93,6 @@ class UserManager:
             raise BadRequest(f'{user_model} user with ID {_id} does not exist!')
 
         db.session.delete(user)
-        db.session.commit()
+        db.session.flush()
 
         return user.id

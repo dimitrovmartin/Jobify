@@ -43,4 +43,7 @@ def verify_token(token):
                  'AdminUserModel': AdminUserModel,
                  'user_id': user_id})
 
+    if not user:
+        raise BadRequest('Invalid token!')
+
     return user

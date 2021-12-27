@@ -1,21 +1,31 @@
-from flask import Flask
-from flask_migrate import Migrate
-from flask_restful import Api
+from psycopg2.errorcodes import UNIQUE_VIOLATION
+from werkzeug.exceptions import BadRequest, InternalServerError
 
-from config import DevelopmentConfig
+from config import create_app
 from db import db
-from resources.routes import routes
 
-app = Flask(__name__)
-app.config.from_object(DevelopmentConfig)
+app = create_app()
 
-db.init_app(app)
 
-migrate = Migrate(app, db)
+@app.before_first_request
+def create_tables():
+    db.init_app(app)
+    db.create_all()
 
-api = Api(app)
 
-[api.add_resource(*r) for r in routes]
+@app.after_request
+def conclude_request(resp):
+    try:
+        db.session.commit()
+    except Exception as ex:
+        if ex.orig.pgcode == UNIQUE_VIOLATION:
+            raise BadRequest(
+                "Please login!"
+            )
+        else:
+            raise InternalServerError("Server is not available")
+    return resp
+
 
 if __name__ == '__main__':
     app.run()

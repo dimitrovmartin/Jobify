@@ -20,7 +20,7 @@ class AdvertisementManager:
         advertisement = AdvertisementModel(**data)
 
         db.session.add(advertisement)
-        db.session.commit()
+        db.session.flush()
         return advertisement
 
     @staticmethod
@@ -33,7 +33,7 @@ class AdvertisementManager:
 
         db.session.add(applied_advertisement)
         try:
-            db.session.commit()
+            db.session.flush()
         except Exception:
             raise BadRequest('Invalid ad')
         return applied_advertisement
@@ -55,7 +55,7 @@ class AdvertisementManager:
             raise BadRequest('Invalid ID!')
 
         db.session.delete(ad)
-        db.session.commit()
+        db.session.flush()
 
     @staticmethod
     def get_all_advertisements():
@@ -73,7 +73,7 @@ class AdvertisementManager:
 
         ad = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).first()
 
-        db.session.commit()
+        db.session.flush()
 
         return ad
 
@@ -134,7 +134,7 @@ class AdvertisementManager:
 
         send_mail(applicant.email, applied_ad.status.value, ad.title)
 
-        db.session.commit()
+        db.session.flush()
 
     @staticmethod
     def attach_company_to_advertisements(ad):
