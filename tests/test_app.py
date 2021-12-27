@@ -4,6 +4,8 @@ from flask_testing import TestCase
 
 from config import create_app
 from db import db
+from managers.auth import AuthManager
+from tests.factories import ApplicantFactory
 
 
 class TestApplication(TestCase):
@@ -51,8 +53,22 @@ class TestApplication(TestCase):
             assert resp.status_code == 400
             assert resp.json == {'message': 'Invalid token!'}
 
-    def test_permission_required_endpoints_admin_access_raises(self):
-        # Create complainer, create token for it and test all
-        # ADMIN endpoints with complainer token -
-        # they should return
-        pass
+    def test_protected_admin_endpoints_require_admin_rights(self):
+        url_methods = [
+            ('/registerAdmin', "POST"),
+            ('/companyUsers/1/delete', "DELETE"),
+            ('/applicantUsers/1/delete', "DELETE"),
+        ]
+        complainer = ApplicantFactory()
+        token = AuthManager.encode_token(complainer)
+        headers = {"Authorization": f"Bearer {token}"}
+
+        for url, method in url_methods:
+
+            if method == "POST":
+                resp = self.client.post(url, data=json.dumps({}), headers=headers)
+            elif method == "DELETE":
+                resp = self.client.delete(url, headers=headers)
+
+            assert resp.status_code == 403
+            assert resp.json == {'message': 'You don`t have access to this resource!'}
