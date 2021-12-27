@@ -46,6 +46,7 @@ class LoginCompany(Resource):
 
 
 class RegisterAdmin(Resource):
+    @auth.login_required
     @permission_required(RoleType.admin)
     @validate_schema(AdminRegisterRequestSchema)
     def post(self):
