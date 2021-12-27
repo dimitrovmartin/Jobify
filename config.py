@@ -28,7 +28,9 @@ class TestApplicationConfiguration:
 def create_app(configuration="config.DevApplicationConfiguration"):
     app = Flask(__name__)
     app.config.from_object(configuration)
-    migrate = Migrate(app, db)
+    db.init_app(app)
+    migrate = Migrate(compare=True)
+    migrate.init_app(app, db)
     api = Api(app)
     [api.add_resource(*r) for r in routes]
     return app

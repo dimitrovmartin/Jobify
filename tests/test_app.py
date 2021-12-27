@@ -21,7 +21,6 @@ class TestApplication(TestCase):
         return create_app("config.TestApplicationConfiguration")
 
     def test_authentication_missing_auth_header_raises(self):
-        # Arrange
         url_methods = [
             ('/registerAdmin', "POST"),
             ('/advertisements', "POST"),
@@ -38,7 +37,6 @@ class TestApplication(TestCase):
 
         ]
 
-        # Act
         for url, method in url_methods:
             if method == "GET":
                 resp = self.client.get(url)
@@ -49,7 +47,6 @@ class TestApplication(TestCase):
             else:
                 resp = self.client.delete(url)
 
-            # Assert
             assert resp.status_code == 400
             assert resp.json == {'message': 'Invalid token!'}
 
