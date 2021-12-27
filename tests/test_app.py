@@ -5,7 +5,7 @@ from flask_testing import TestCase
 from config import create_app
 from db import db
 from managers.auth import AuthManager
-from tests.factories import ApplicantFactory
+from tests.factories import ApplicantFactory, CompanyFactory
 
 
 class TestApplication(TestCase):
@@ -78,6 +78,26 @@ class TestApplication(TestCase):
                 resp = self.client.put(url, data=json.dumps({}), headers=headers)
             else:
                 resp = self.client.delete(url, headers=headers)
+
+            assert resp.status_code == 403
+            assert resp.json == {'message': 'You don`t have access to this resource!'}
+
+    def test_protected_applicant_endpoints_require_applicant_rights(self):
+        url_methods = [
+            ('/advertisements/1/apply', "POST"),
+            ('/advertisements/userPosition', "GET"),
+        ]
+
+        company = CompanyFactory()
+        token = AuthManager.encode_token(company)
+        headers = {"Authorization": f"Bearer {token}"}
+
+        for url, method in url_methods:
+
+            if method == "GET":
+                resp = self.client.get(url, headers=headers)
+            elif method == "POST":
+                resp = self.client.post(url, data=json.dumps({}), headers=headers)
 
             assert resp.status_code == 403
             assert resp.json == {'message': 'You don`t have access to this resource!'}
