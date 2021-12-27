@@ -25,7 +25,7 @@ class ApplicantUserModel(BaseUserModel):
     education = db.Column(db.String(255), nullable=False)
     photo_url = db.Column(db.String, nullable=False)
     advertisements = db.relationship("AdvertisementModel", secondary="applied_advertisements",
-                                     back_populates='appliers', cascade="all, delete-orphan")
+                                     back_populates='appliers')
 
 
 class CompanyUserModel(BaseUserModel):

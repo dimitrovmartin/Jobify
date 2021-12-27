@@ -10,6 +10,6 @@ class AdvertisementModel(db.Model):
     salary = db.Column(db.Float, nullable=True)
     description = db.Column(db.Text, nullable=False)
     company_user_id = db.Column(db.Integer, db.ForeignKey('company_users.id'))
-    company = db.relationship('CompanyUserModel', cascade="all, delete-orphan")
+    company = db.relationship('CompanyUserModel')
     appliers = db.relationship('ApplicantUserModel', secondary="applied_advertisements",
-                               back_populates='advertisements', cascade="all, delete-orphan")
+                               back_populates='advertisements')
