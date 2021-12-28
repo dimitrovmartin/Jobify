@@ -13,10 +13,12 @@ class AdvertisementManager:
     @staticmethod
     def create(data, company_user_id):
         data['company_user_id'] = company_user_id
-        position = data['position']
-        position_key = [i.name for i in Positions if i.value == position][0]
+        position = data.get('position')
+        if position:
+            position_key = [i.name for i in Positions if i.value == position][0]
 
-        data['position'] = eval(f'Positions.{position_key}')
+            data['position'] = eval(f'Positions.{position_key}')
+
         advertisement = AdvertisementModel(**data)
 
         db.session.add(advertisement)

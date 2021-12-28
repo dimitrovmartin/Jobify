@@ -11,6 +11,10 @@ def mock_uuid():
     return "1111"
 
 
+def mock_smtp():
+    return '0'
+
+
 def generate_token(user):
     return AuthManager.encode_token(user)
 

@@ -1,11 +1,15 @@
 import json
+import os
+from unittest.mock import patch
 
 from flask_testing import TestCase
 
 from config import create_app
+from constants import TEMP_FILE_FOLDER
 from db import db
 from models import ApplicantUserModel, RoleType, CompanyUserModel
-from tests.helpers import object_as_dict, encoded_photo
+from services.s3 import S3Service
+from tests.helpers import object_as_dict, encoded_photo, mock_uuid
 
 
 class TestAuth(TestCase):
@@ -20,7 +24,9 @@ class TestAuth(TestCase):
         self.headers = {"Content-Type": "application/json"}
         return create_app("config.TestApplicationConfiguration")
 
-    def test_register_applicant(self):
+    @patch("uuid.uuid4", mock_uuid)
+    @patch.object(S3Service, "upload_photo", return_value="some.s3.url")
+    def test_register_applicant(self, mocked_upload):
         url = "/registerApplicant"
 
         data = {
@@ -53,7 +59,7 @@ class TestAuth(TestCase):
 
         data.pop("password")
         data.pop('photo')
-        data.pop('photo_extension')
+        extension = data.pop('photo_extension')
         applicant['position'] = applicant['position'].value
 
         assert applicant == {
@@ -63,7 +69,12 @@ class TestAuth(TestCase):
             **data,
         }
 
-    def test_applicant_already_exists_raises(self):
+        photo_name = f"{mock_uuid()}.{extension}"
+        path = os.path.join(TEMP_FILE_FOLDER, photo_name)
+        mocked_upload.assert_called_once_with(path, photo_name)
+
+    @patch.object(S3Service, "upload_photo", return_value="some.s3.url")
+    def test_applicant_already_exists_raises(self, mocked_upload):
         url = "/registerApplicant"
 
         data = {
