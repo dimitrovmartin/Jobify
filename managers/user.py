@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from constants import TEMP_FILE_FOLDER
 from db import db
-from models import Positions
+from models import Positions, AdvertisementModel
 from models.user import ApplicantUserModel, CompanyUserModel, AdminUserModel
 from services.s3 import S3Service
 from utils.helpers import decode_photo
@@ -91,6 +91,11 @@ class UserManager:
 
         if not user:
             raise BadRequest(f'{user_model} user with ID {_id} does not exist!')
+
+        # Delete all advertisements that was created from this company because i have
+        # problem with cascade delete on one-to-many tables
+
+        AdvertisementModel.query.filter_by(company_user_id=_id).delete()
 
         db.session.delete(user)
         db.session.flush()
