@@ -10,7 +10,7 @@ from tests.factories import CompanyFactory, ApplicantFactory, AdvertisementFacto
 from tests.helpers import generate_token, object_as_dict, mock_smtp
 
 
-class TestComplaint(TestCase):
+class TestAdvertisement(TestCase):
     def setUp(self):
         db.create_all()
 
