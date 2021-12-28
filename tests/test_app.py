@@ -10,7 +10,6 @@ from tests.factories import ApplicantFactory, CompanyFactory
 
 class TestApplication(TestCase):
     def setUp(self):
-        db.init_app(self.app)
         db.create_all()
 
     def tearDown(self):
