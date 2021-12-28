@@ -12,38 +12,37 @@ class BaseUserModel(db.Model):
 
 
 class ApplicantUserModel(BaseUserModel):
-    __tablename__ = 'applicant_users'
+    __tablename__ = "applicant_users"
 
     first_name = db.Column(db.String(255), nullable=False)
     last_name = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.Enum(RoleType),
-                     default=RoleType.applicant,
-                     nullable=False)
-    position = db.Column(db.Enum(Positions),
-                         default=Positions.unemployed,
-                         nullable=True)
+    role = db.Column(db.Enum(RoleType), default=RoleType.applicant, nullable=False)
+    position = db.Column(
+        db.Enum(Positions), default=Positions.unemployed, nullable=True
+    )
     education = db.Column(db.String(255), nullable=False)
     photo_url = db.Column(db.String, nullable=False)
-    advertisements = db.relationship("AdvertisementModel", secondary="applied_advertisements",
-                                     back_populates='appliers')
+    advertisements = db.relationship(
+        "AdvertisementModel",
+        secondary="applied_advertisements",
+        back_populates="appliers",
+    )
 
 
 class CompanyUserModel(BaseUserModel):
-    __tablename__ = 'company_users'
+    __tablename__ = "company_users"
 
     company_name = db.Column(db.String(255), nullable=False, unique=True)
     address = db.Column(db.String(255), nullable=False)
     employees_count = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(255), nullable=False)
-    role = db.Column(db.Enum(RoleType),
-                     default=RoleType.company,
-                     nullable=False)
-    advertisements = db.relationship("AdvertisementModel", back_populates='company', lazy='dynamic')
+    role = db.Column(db.Enum(RoleType), default=RoleType.company, nullable=False)
+    advertisements = db.relationship(
+        "AdvertisementModel", back_populates="company", lazy="dynamic"
+    )
 
 
 class AdminUserModel(BaseUserModel):
-    __tablename__ = 'admin_users'
+    __tablename__ = "admin_users"
 
-    role = db.Column(db.Enum(RoleType),
-                     default=RoleType.admin,
-                     nullable=False)
+    role = db.Column(db.Enum(RoleType), default=RoleType.admin, nullable=False)

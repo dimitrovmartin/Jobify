@@ -38,8 +38,7 @@ class TestAuth(TestCase):
             "photo_extension": "jpg",
             "email": "vipernapier751@gmail.com",
             "password": "123456",
-            "phone": "0879696799"
-
+            "phone": "0879696799",
         }
 
         applicants = ApplicantUserModel.query.all()
@@ -58,14 +57,14 @@ class TestAuth(TestCase):
         applicant.pop("password")
 
         data.pop("password")
-        data.pop('photo')
-        extension = data.pop('photo_extension')
-        applicant['position'] = applicant['position'].value
+        data.pop("photo")
+        extension = data.pop("photo_extension")
+        applicant["position"] = applicant["position"].value
 
         assert applicant == {
             "id": applicant["id"],
             "role": RoleType.applicant,
-            "photo_url": applicant['photo_url'],
+            "photo_url": applicant["photo_url"],
             **data,
         }
 
@@ -86,8 +85,7 @@ class TestAuth(TestCase):
             "photo_extension": "jpg",
             "email": "vipernapier751@gmail.com",
             "password": "123456",
-            "phone": "0123456789"
-
+            "phone": "0123456789",
         }
 
         resp = self.client.post(url, data=json.dumps(data), headers=self.headers)
@@ -110,7 +108,7 @@ class TestAuth(TestCase):
             "description": "Test description",
             "email": "Test@Test.com",
             "password": "123456",
-            "phone": "0123456789"
+            "phone": "0123456789",
         }
 
         companies = CompanyUserModel.query.all()
@@ -128,7 +126,7 @@ class TestAuth(TestCase):
 
         company = object_as_dict(companies[0])
         company.pop("password")
-        data.pop('password')
+        data.pop("password")
 
         assert company == {
             "id": company["id"],
@@ -146,7 +144,7 @@ class TestAuth(TestCase):
             "description": "Test description",
             "email": "Test@Test.com",
             "password": "123456",
-            "phone": "0123456789"
+            "phone": "0123456789",
         }
 
         resp = self.client.post(url, data=json.dumps(data), headers=self.headers)

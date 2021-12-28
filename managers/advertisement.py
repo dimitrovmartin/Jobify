@@ -3,8 +3,14 @@ from flask import make_response
 from werkzeug.exceptions import BadRequest
 
 from db import db
-from models import AdvertisementModel, AppliedAdvertisementModel, CompanyUserModel, Positions, Status, \
-    ApplicantUserModel
+from models import (
+    AdvertisementModel,
+    AppliedAdvertisementModel,
+    CompanyUserModel,
+    Positions,
+    Status,
+    ApplicantUserModel,
+)
 from schemas.response.advertisement import AdvertisementResponseSchema
 from services.email_service import send_mail
 
@@ -12,12 +18,12 @@ from services.email_service import send_mail
 class AdvertisementManager:
     @staticmethod
     def create(data, company_user_id):
-        data['company_user_id'] = company_user_id
-        position = data.get('position')
+        data["company_user_id"] = company_user_id
+        position = data.get("position")
         if position:
             position_key = [i.name for i in Positions if i.value == position][0]
 
-            data['position'] = eval(f'Positions.{position_key}')
+            data["position"] = eval(f"Positions.{position_key}")
 
         advertisement = AdvertisementModel(**data)
 
@@ -27,17 +33,20 @@ class AdvertisementManager:
 
     @staticmethod
     def apply(user_id, advertisement_id):
-        if AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id,
-                                                     advertisement_id=advertisement_id).first():
-            raise BadRequest('You\'ve already apply your CV to this Ad!')
+        if AppliedAdvertisementModel.query.filter_by(
+            applicant_user_id=user_id, advertisement_id=advertisement_id
+        ).first():
+            raise BadRequest("You've already apply your CV to this Ad!")
 
-        applied_advertisement = AppliedAdvertisementModel(applicant_user_id=user_id, advertisement_id=advertisement_id)
+        applied_advertisement = AppliedAdvertisementModel(
+            applicant_user_id=user_id, advertisement_id=advertisement_id
+        )
 
         db.session.add(applied_advertisement)
         try:
             db.session.flush()
         except Exception:
-            raise BadRequest('Invalid ad')
+            raise BadRequest("Invalid ad")
         return applied_advertisement
 
     @staticmethod
@@ -45,16 +54,18 @@ class AdvertisementManager:
         ad = AdvertisementModel.query.filter_by(id=_id).first()
 
         if not ad:
-            raise BadRequest('Invalid ID!')
+            raise BadRequest("Invalid ID!")
 
         return AdvertisementManager.attach_company_to_advertisements(ad)
 
     @staticmethod
     def delete(_id, current_user_id):
-        ad = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).first()
+        ad = AdvertisementModel.query.filter_by(
+            id=_id, company_user_id=current_user_id
+        ).first()
 
         if not ad:
-            raise BadRequest('Invalid ID!')
+            raise BadRequest("Invalid ID!")
 
         db.session.delete(ad)
         db.session.flush()
@@ -66,14 +77,18 @@ class AdvertisementManager:
     @staticmethod
     def update(_id, current_user_id, data):
         if not data:
-            raise BadRequest('Invalid JSON!')
+            raise BadRequest("Invalid JSON!")
 
-        num_rows_updated = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).update(data)
+        num_rows_updated = AdvertisementModel.query.filter_by(
+            id=_id, company_user_id=current_user_id
+        ).update(data)
 
         if not num_rows_updated:
-            raise BadRequest('Invalid ID!')
+            raise BadRequest("Invalid ID!")
 
-        ad = AdvertisementModel.query.filter_by(id=_id, company_user_id=current_user_id).first()
+        ad = AdvertisementModel.query.filter_by(
+            id=_id, company_user_id=current_user_id
+        ).first()
 
         db.session.flush()
 
@@ -84,7 +99,7 @@ class AdvertisementManager:
         company = CompanyUserModel.query.filter_by(company_name=company_name).first()
 
         if not company:
-            raise BadRequest('Invalid company!')
+            raise BadRequest("Invalid company!")
 
         return company.advertisements
 
@@ -92,9 +107,11 @@ class AdvertisementManager:
     def get_all_advertisements_by_position(position):
         if isinstance(position, str):
             try:
-                position = eval(f'Positions.{position.lower()}', {'Positions': Positions})
+                position = eval(
+                    f"Positions.{position.lower()}", {"Positions": Positions}
+                )
             except Exception:
-                raise BadRequest('Invalid position!')
+                raise BadRequest("Invalid position!")
 
         ads = AdvertisementModel.query.filter_by(position=position).all()
 
@@ -102,32 +119,37 @@ class AdvertisementManager:
 
     @staticmethod
     def approve(ad_id, user_id, current_user):
-        AdvertisementManager.change_status(ad_id, user_id, current_user, Status.approved)
+        AdvertisementManager.change_status(
+            ad_id, user_id, current_user, Status.approved
+        )
 
     @staticmethod
     def reject(ad_id, user_id, current_user):
-        AdvertisementManager.change_status(ad_id, user_id, current_user, Status.rejected)
+        AdvertisementManager.change_status(
+            ad_id, user_id, current_user, Status.rejected
+        )
 
     @staticmethod
     def __validate_ad(ad, advertisements):
         for a in advertisements:
             if a.id == ad.advertisement_id:
                 if ad.status == Status.approved:
-                    raise BadRequest('This advertisement was already approved!')
+                    raise BadRequest("This advertisement was already approved!")
 
                 if ad.status == Status.rejected:
-                    raise BadRequest('This advertisement was already rejected!')
+                    raise BadRequest("This advertisement was already rejected!")
 
                 return a
 
-        raise BadRequest('Invalid Advertisement!')
+        raise BadRequest("Invalid Advertisement!")
 
     @staticmethod
     def change_status(ad_id, user_id, current_user, status):
-        applied_ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=user_id,
-                                                               advertisement_id=ad_id).first()
+        applied_ad = AppliedAdvertisementModel.query.filter_by(
+            applicant_user_id=user_id, advertisement_id=ad_id
+        ).first()
         if not applied_ad:
-            raise BadRequest('Invalid ID!')
+            raise BadRequest("Invalid ID!")
 
         ad = AdvertisementManager.__validate_ad(applied_ad, current_user.advertisements)
         applicant = ApplicantUserModel.query.filter_by(id=user_id).first()
@@ -144,13 +166,13 @@ class AdvertisementManager:
 
         ad = AdvertisementResponseSchema().dump(ad)
 
-        ad['company'] = {}
-        ad['company']['company_name'] = company.company_name
-        ad['company']['address'] = company.address
-        ad['company']['email'] = company.email
-        ad['company']['phone'] = company.phone
-        ad['company']['description'] = company.description
-        ad['company']['employees_count'] = company.employees_count
+        ad["company"] = {}
+        ad["company"]["company_name"] = company.company_name
+        ad["company"]["address"] = company.address
+        ad["company"]["email"] = company.email
+        ad["company"]["phone"] = company.phone
+        ad["company"]["description"] = company.description
+        ad["company"]["employees_count"] = company.employees_count
 
         return ad
 
@@ -164,7 +186,7 @@ class AdvertisementManager:
                 break
 
         if not searched_ad:
-            raise BadRequest('Invalid Ad!')
+            raise BadRequest("Invalid Ad!")
 
         return searched_ad.appliers
 

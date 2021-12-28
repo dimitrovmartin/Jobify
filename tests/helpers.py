@@ -12,7 +12,7 @@ def mock_uuid():
 
 
 def mock_smtp():
-    return '0'
+    return "0"
 
 
 def generate_token(user):

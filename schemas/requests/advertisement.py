@@ -13,5 +13,7 @@ class AdvertisementCreateRequestSchema(Schema):
 
 class AdvertisementUpdateRequestSchema(Schema):
     title = fields.String(validate=validate.Length(min=5, max=100), allow_none=True)
-    description = fields.String(validate=validate.Length(min=5, max=100), allow_none=True)
+    description = fields.String(
+        validate=validate.Length(min=5, max=100), allow_none=True
+    )
     salary = fields.Float(validate=validate.Range(min=650), allow_none=True)

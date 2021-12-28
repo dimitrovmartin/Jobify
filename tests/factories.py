@@ -3,8 +3,15 @@ from random import randint
 import factory
 
 from db import db
-from models import ApplicantUserModel, RoleType, Positions, CompanyUserModel, AdvertisementModel, \
-    AppliedAdvertisementModel, Status
+from models import (
+    ApplicantUserModel,
+    RoleType,
+    Positions,
+    CompanyUserModel,
+    AdvertisementModel,
+    AppliedAdvertisementModel,
+    Status,
+)
 
 
 class BaseFactory(factory.Factory):
@@ -26,9 +33,9 @@ class ApplicantFactory(BaseFactory):
     email = factory.Faker("email")
     phone = str(randint(100000, 200000))
     password = factory.Faker("password")
-    education = 'some educ'
+    education = "some educ"
     role = RoleType.applicant
-    photo_url = 'photo.url'
+    photo_url = "photo.url"
     position = Positions.software_developer
 
 
@@ -42,20 +49,22 @@ class CompanyFactory(BaseFactory):
     phone = str(randint(100000, 200000))
     password = factory.Faker("password")
     role = RoleType.company
-    address = factory.Faker('address')
-    description = 'some desc'
+    address = factory.Faker("address")
+    description = "some desc"
     employees_count = str(randint(10, 1000))
+
 
 class AdvertisementFactory(BaseFactory):
     class Meta:
         model = AdvertisementModel
 
     id = factory.Sequence(lambda n: n)
-    title = 'Testing test test'
+    title = "Testing test test"
     position = Positions.software_developer
     salary = 650
-    description = 'Testy description'
+    description = "Testy description"
     company_user_id = 0
+
 
 class AppliedAdFactory(BaseFactory):
     class Meta:

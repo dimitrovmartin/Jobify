@@ -24,10 +24,14 @@ class ApplicantLoginRequestSchema(BaseUserSchema):
 
 
 class CompanyRegisterRequestSchema(BaseUserSchema):
-    company_name = fields.String(required=True, validate=validate.Length(min=2, max=255))
+    company_name = fields.String(
+        required=True, validate=validate.Length(min=2, max=255)
+    )
     address = fields.String(required=True, validate=validate.Length(min=2, max=255))
     employees_count = fields.Integer(required=True)
-    description = fields.String(required=True, validate=validate.Length(min=10, max=255))
+    description = fields.String(
+        required=True, validate=validate.Length(min=10, max=255)
+    )
     phone = fields.String(required=True, validate=validate.Length(min=10, max=10))
 
 

@@ -22,19 +22,18 @@ class TestApplication(TestCase):
     def test_authentication_missing_auth_header_raises(self):
         # Arrange
         url_methods = [
-            ('/registerAdmin', "POST"),
-            ('/advertisements', "POST"),
-            ('/advertisements/1/appliers', "GET"),
-            ('/advertisements/1/appliers/export', "GET"),
-            ('/advertisements/1/apply', "POST"),
-            ('/advertisements/1/delete', "DELETE"),
-            ('/advertisements/1/update', "PUT"),
-            ('/advertisements/userPosition', "GET"),
-            ('/advertisements/1/1/approve', "POST"),
-            ('/advertisements/1/1/reject', "POST"),
-            ('/companyUsers/1/delete', "DELETE"),
-            ('/applicantUsers/1/delete', "DELETE"),
-
+            ("/registerAdmin", "POST"),
+            ("/advertisements", "POST"),
+            ("/advertisements/1/appliers", "GET"),
+            ("/advertisements/1/appliers/export", "GET"),
+            ("/advertisements/1/apply", "POST"),
+            ("/advertisements/1/delete", "DELETE"),
+            ("/advertisements/1/update", "PUT"),
+            ("/advertisements/userPosition", "GET"),
+            ("/advertisements/1/1/approve", "POST"),
+            ("/advertisements/1/1/reject", "POST"),
+            ("/companyUsers/1/delete", "DELETE"),
+            ("/applicantUsers/1/delete", "DELETE"),
         ]
 
         # Act
@@ -50,17 +49,17 @@ class TestApplication(TestCase):
 
             # Assert
             assert resp.status_code == 400
-            assert resp.json == {'message': 'Invalid token!'}
+            assert resp.json == {"message": "Invalid token!"}
 
     def test_protected_company_endpoints_require_company_rights(self):
         url_methods = [
-            ('/advertisements', "POST"),
-            ('/advertisements/1/appliers', "GET"),
-            ('/advertisements/1/appliers/export', "GET"),
-            ('/advertisements/1/delete', "DELETE"),
-            ('/advertisements/1/update', "PUT"),
-            ('/advertisements/1/1/approve', "POST"),
-            ('/advertisements/1/1/reject', "POST"),
+            ("/advertisements", "POST"),
+            ("/advertisements/1/appliers", "GET"),
+            ("/advertisements/1/appliers/export", "GET"),
+            ("/advertisements/1/delete", "DELETE"),
+            ("/advertisements/1/update", "PUT"),
+            ("/advertisements/1/1/approve", "POST"),
+            ("/advertisements/1/1/reject", "POST"),
         ]
 
         applier = ApplicantFactory()
@@ -79,12 +78,12 @@ class TestApplication(TestCase):
                 resp = self.client.delete(url, headers=headers)
 
             assert resp.status_code == 403
-            assert resp.json == {'message': 'You don`t have access to this resource!'}
+            assert resp.json == {"message": "You don`t have access to this resource!"}
 
     def test_protected_applicant_endpoints_require_applicant_rights(self):
         url_methods = [
-            ('/advertisements/1/apply', "POST"),
-            ('/advertisements/userPosition', "GET"),
+            ("/advertisements/1/apply", "POST"),
+            ("/advertisements/userPosition", "GET"),
         ]
 
         company = CompanyFactory()
@@ -99,13 +98,13 @@ class TestApplication(TestCase):
                 resp = self.client.post(url, data=json.dumps({}), headers=headers)
 
             assert resp.status_code == 403
-            assert resp.json == {'message': 'You don`t have access to this resource!'}
+            assert resp.json == {"message": "You don`t have access to this resource!"}
 
     def test_protected_admin_endpoints_require_admin_rights(self):
         url_methods = [
-            ('/registerAdmin', "POST"),
-            ('/companyUsers/1/delete', "DELETE"),
-            ('/applicantUsers/1/delete', "DELETE"),
+            ("/registerAdmin", "POST"),
+            ("/companyUsers/1/delete", "DELETE"),
+            ("/applicantUsers/1/delete", "DELETE"),
         ]
 
         applier = ApplicantFactory()
@@ -120,4 +119,4 @@ class TestApplication(TestCase):
                 resp = self.client.delete(url, headers=headers)
 
             assert resp.status_code == 403
-            assert resp.json == {'message': 'You don`t have access to this resource!'}
+            assert resp.json == {"message": "You don`t have access to this resource!"}

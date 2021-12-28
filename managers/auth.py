@@ -12,38 +12,42 @@ class AuthManager:
     @staticmethod
     def encode_token(user):
         payload = {
-            'sub': user.id,
-            'exp': datetime.utcnow() + timedelta(days=100),
-            'role': user.role.value
+            "sub": user.id,
+            "exp": datetime.utcnow() + timedelta(days=100),
+            "role": user.role.value,
         }
 
-        return jwt.encode(payload, key=config('JWT_KEY'), algorithm='HS256')
+        return jwt.encode(payload, key=config("JWT_KEY"), algorithm="HS256")
 
     @staticmethod
     def decode_token(token):
         try:
-            data = jwt.decode(token, key=config('JWT_KEY'), algorithms=['HS256'])
-            return data['sub'], data['role']
+            data = jwt.decode(token, key=config("JWT_KEY"), algorithms=["HS256"])
+            return data["sub"], data["role"]
         except jwt.ExpiredSignatureError:
-            raise BadRequest('Token expired!')
+            raise BadRequest("Token expired!")
         except jwt.InvalidTokenError:
-            raise BadRequest('Invalid token!')
+            raise BadRequest("Invalid token!")
 
 
-auth = HTTPTokenAuth(scheme='Bearer')
+auth = HTTPTokenAuth(scheme="Bearer")
 
 
 @auth.verify_token
 def verify_token(token):
     user_id, role = AuthManager.decode_token(token)
 
-    user = eval(f'{role.title()}UserModel.query.filter_by(id=user_id).first()',
-                {'ApplicantUserModel': ApplicantUserModel,
-                 'CompanyUserModel': CompanyUserModel,
-                 'AdminUserModel': AdminUserModel,
-                 'user_id': user_id})
+    user = eval(
+        f"{role.title()}UserModel.query.filter_by(id=user_id).first()",
+        {
+            "ApplicantUserModel": ApplicantUserModel,
+            "CompanyUserModel": CompanyUserModel,
+            "AdminUserModel": AdminUserModel,
+            "user_id": user_id,
+        },
+    )
 
     if not user:
-        raise BadRequest('Invalid token!')
+        raise BadRequest("Invalid token!")
 
     return user

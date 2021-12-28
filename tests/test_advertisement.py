@@ -6,7 +6,12 @@ from flask_testing import TestCase
 from config import create_app
 from db import db
 from models import AdvertisementModel, AppliedAdvertisementModel, Status
-from tests.factories import CompanyFactory, ApplicantFactory, AdvertisementFactory, AppliedAdFactory
+from tests.factories import (
+    CompanyFactory,
+    ApplicantFactory,
+    AdvertisementFactory,
+    AppliedAdFactory,
+)
 from tests.helpers import generate_token, object_as_dict, mock_smtp
 
 
@@ -24,10 +29,7 @@ class TestAdvertisement(TestCase):
 
     def test_create_ad_invalid_input_fields_raises(self):
         url = "/advertisements"
-        data = {
-            "title": "Searching for Test Testov",
-            "description": "biva rabotata"
-        }
+        data = {"title": "Searching for Test Testov", "description": "biva rabotata"}
 
         company = CompanyFactory()
         token = generate_token(company)
@@ -50,10 +52,7 @@ class TestAdvertisement(TestCase):
     def test_invalid_fields_length_raises(self):
         long_text = "a" * 200
         url = "/advertisements"
-        data = {
-            "title": f"{long_text}",
-            "description": f"{long_text}"
-        }
+        data = {"title": f"{long_text}", "description": f"{long_text}"}
 
         company = CompanyFactory()
         token = generate_token(company)
@@ -81,7 +80,7 @@ class TestAdvertisement(TestCase):
             "title": "Searching for Software Developer",
             "position": "Software Developer",
             "description": "biva rabotata",
-            "salary": 650
+            "salary": 650,
         }
 
         company = CompanyFactory()
@@ -96,13 +95,10 @@ class TestAdvertisement(TestCase):
         assert len(ads) == 1
 
         ad = object_as_dict(ads[0])
-        ad.pop('company_user_id')
-        ad['position'] = ad['position'].value
+        ad.pop("company_user_id")
+        ad["position"] = ad["position"].value
 
-        assert ad == {
-            "id": ad['id'],
-            **data
-        }
+        assert ad == {"id": ad["id"], **data}
 
     def test_apply_advertisement(self):
         url = "/advertisements/0/apply"
@@ -115,10 +111,13 @@ class TestAdvertisement(TestCase):
 
         resp = self.client.post(url, headers=self.headers)
 
-        assert resp.json == {'message': 'You successfully applied your CV to this Ad! Status: sent'}
+        assert resp.json == {
+            "message": "You successfully applied your CV to this Ad! Status: sent"
+        }
 
-        applied_ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=applicant.id,
-                                                               advertisement_id=0).first()
+        applied_ad = AppliedAdvertisementModel.query.filter_by(
+            applicant_user_id=applicant.id, advertisement_id=0
+        ).first()
 
         assert applied_ad is not None
 
@@ -136,10 +135,11 @@ class TestAdvertisement(TestCase):
 
         resp = self.client.post(url, headers=self.headers)
 
-        assert resp.json == {'message': 'User with ID 0 was approved for the job!'}
+        assert resp.json == {"message": "User with ID 0 was approved for the job!"}
 
-        applied_ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=applicant.id,
-                                                               advertisement_id=0).first()
+        applied_ad = AppliedAdvertisementModel.query.filter_by(
+            applicant_user_id=applicant.id, advertisement_id=0
+        ).first()
 
         assert applied_ad.status == Status.approved
 
@@ -157,9 +157,10 @@ class TestAdvertisement(TestCase):
 
         resp = self.client.post(url, headers=self.headers)
 
-        assert resp.json == {'message': 'User with ID 0 was rejected!'}
+        assert resp.json == {"message": "User with ID 0 was rejected!"}
 
-        applied_ad = AppliedAdvertisementModel.query.filter_by(applicant_user_id=applicant.id,
-                                                               advertisement_id=0).first()
+        applied_ad = AppliedAdvertisementModel.query.filter_by(
+            applicant_user_id=applicant.id, advertisement_id=0
+        ).first()
 
         assert applied_ad.status == Status.rejected

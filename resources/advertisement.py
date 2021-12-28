@@ -4,8 +4,10 @@ from flask_restful import Resource
 from managers.advertisement import AdvertisementManager
 from managers.auth import auth
 from models import RoleType
-from schemas.requests.advertisement import AdvertisementCreateRequestSchema, \
-    AdvertisementUpdateRequestSchema
+from schemas.requests.advertisement import (
+    AdvertisementCreateRequestSchema,
+    AdvertisementUpdateRequestSchema,
+)
 from schemas.response.advertisement import AdvertisementResponseSchema
 from schemas.response.user import ApplicantResponseSchema
 from utils.decorators import validate_schema, permission_required
@@ -23,7 +25,7 @@ class AdvertisementListCreate(Resource):
         current_user = auth.current_user()
         ad = AdvertisementManager.create(request.get_json(), current_user.id)
 
-        return {'ad_id': ad.id}
+        return {"ad_id": ad.id}
 
 
 class AdvertisementGet(Resource):
@@ -38,7 +40,7 @@ class AdvertisementDelete(Resource):
         current_user = auth.current_user()
         AdvertisementManager.delete(_id, current_user.id)
 
-        return {'message': f'Advertisement with ID {_id} was successfully deleted.'}
+        return {"message": f"Advertisement with ID {_id} was successfully deleted."}
 
 
 class ApplyAdvertisement(Resource):
@@ -48,7 +50,9 @@ class ApplyAdvertisement(Resource):
         current_user = auth.current_user()
         applied_advertisement = AdvertisementManager.apply(current_user.id, _id)
 
-        return {'message': f'You successfully applied your CV to this Ad! Status: {applied_advertisement.status.value}'}
+        return {
+            "message": f"You successfully applied your CV to this Ad! Status: {applied_advertisement.status.value}"
+        }
 
 
 class AdvertisementUpdate(Resource):
@@ -75,7 +79,8 @@ class AdvertisementsPerUserPosition(Resource):
     def get(self):
         current_user = auth.current_user()
         ads = AdvertisementManager.get_all_advertisements_by_position(
-            current_user.position)
+            current_user.position
+        )
         return AdvertisementResponseSchema().dump(ads, many=True)
 
 
@@ -92,7 +97,7 @@ class ApproveAdvertisement(Resource):
         current_user = auth.current_user()
         AdvertisementManager.approve(ad_id, user_id, current_user)
 
-        return {'message': f'User with ID {user_id} was approved for the job!'}
+        return {"message": f"User with ID {user_id} was approved for the job!"}
 
 
 class RejectAdvertisement(Resource):
@@ -102,7 +107,7 @@ class RejectAdvertisement(Resource):
         current_user = auth.current_user()
         AdvertisementManager.reject(ad_id, user_id, current_user)
 
-        return {'message': f'User with ID {user_id} was rejected!'}
+        return {"message": f"User with ID {user_id} was rejected!"}
 
 
 class GetAllAppliersPerAdvertisement(Resource):
@@ -110,7 +115,9 @@ class GetAllAppliersPerAdvertisement(Resource):
     @permission_required(RoleType.company)
     def get(self, _id):
         current_user = auth.current_user()
-        appliers = AdvertisementManager.get_all_appliers_per_advertisement(current_user, _id)
+        appliers = AdvertisementManager.get_all_appliers_per_advertisement(
+            current_user, _id
+        )
 
         return ApplicantResponseSchema().dump(appliers, many=True)
 
@@ -120,7 +127,10 @@ class ExportAllAppliersPerAdvertisement(Resource):
     @permission_required(RoleType.company)
     def get(self, _id):
         current_user = auth.current_user()
-        appliers = AdvertisementManager.get_all_appliers_per_advertisement(current_user, _id)
+        appliers = AdvertisementManager.get_all_appliers_per_advertisement(
+            current_user, _id
+        )
 
-        return AdvertisementManager.get_appliers_as_csv(ApplicantResponseSchema().dump(appliers, many=True))
-
+        return AdvertisementManager.get_appliers_as_csv(
+            ApplicantResponseSchema().dump(appliers, many=True)
+        )
