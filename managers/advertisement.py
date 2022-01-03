@@ -38,6 +38,9 @@ class AdvertisementManager:
         ).first():
             raise BadRequest("You've already apply your CV to this Ad!")
 
+        if not AdvertisementModel.query.filter_by(id=advertisement_id).first():
+            raise BadRequest("Invalid Ad!")
+
         applied_advertisement = AppliedAdvertisementModel(
             applicant_user_id=user_id, advertisement_id=advertisement_id
         )
